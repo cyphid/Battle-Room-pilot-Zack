@@ -51,18 +51,19 @@ def is_cell_occupied(x: int, y: int, game_state: typing.Dict) -> bool:
                 for segment in snake['body']:
                         if segment['x'] == x and segment['y'] == y and not(segment == snake['body'][-1]):
                                 return True
+                          
         # Avoid head-to-head
         for snake in board['snakes']:
             snake_head = snake['body'][0]
             if not snake['id'] == game_state['you']['id'] and snake['length'] <= game_state['you']['length']:
-                if (snake_head['x'] - 1, snake_head['y']) == (x, y) or (snake_head['x'] + 1, snake_head['y']) == (x, y) or (snake_head['x'], snake_head['y']) == (x, y) or (snake_head['x'], snake_head['y'] - 1) == (x, y):
+                if (snake_head['x'] - 1, snake_head['y']) == (x, y) or (snake_head['x'] + 1, snake_head['y']) == (x, y) or (snake_head['x'], snake_head['y'] + 1) == (x, y) or (snake_head['x'], snake_head['y'] - 1) == (x, y):
                   return True
         
         return False
     
 def move_towards_food(snake_pos, food_pos):
-    dx = food_pos["x"] - snake_pos["x"]
-    dy = food_pos["y"] - snake_pos["y"]
+    dx = food_pos["x"] - snake_pos["x"] # -4
+    dy = food_pos["y"] - snake_pos["y"] # -1
     
     if abs(dx) > abs(dy):
             if dx > 0 :
@@ -134,8 +135,6 @@ def move(game_state: typing.Dict) -> typing.Dict:
                 print(f"MOVE {game_state['turn']}: No safe moves detected! Moving up :(")
                 return {"move": "up"}
 
-        # Choose a random move from the safe ones
-        # next_move = random.choice(safe_moves)
 
         # TODO: Step 4 - Move towards food instead of random, to regain health and survive longer
         food = game_state['board']['food']

@@ -1,5 +1,7 @@
 { pkgs }: {
   deps = [
+    pkgs.lsof
+    pkgs.killall
     pkgs.python38Full
   ];
   env = {
