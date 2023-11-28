@@ -55,28 +55,27 @@ def is_cell_occupied(x: int, y: int, game_state: typing.Dict) -> bool:
         # Avoid head-to-head
         for snake in board['snakes']:
             snake_head = snake['body'][0]
-            if not snake['id'] == game_state['you']['id'] and snake['length'] <= game_state['you']['length']:
+            #print(snake['length'], game_state['you']['length'])
+            if not (snake['id'] == game_state['you']['id'] and len(snake['body']) >= len(game_state['you']['body'])):
                 if (snake_head['x'] - 1, snake_head['y']) == (x, y) or (snake_head['x'] + 1, snake_head['y']) == (x, y) or (snake_head['x'], snake_head['y'] + 1) == (x, y) or (snake_head['x'], snake_head['y'] - 1) == (x, y):
                   return True
         
         return False
     
-def move_towards_food(snake_pos, food_pos):
-    dx = food_pos["x"] - snake_pos["x"] # -4
-    dy = food_pos["y"] - snake_pos["y"] # -1
-    
-    if abs(dx) > abs(dy):
-            if dx > 0 :
-                    return "right"
-            else:
-                    return "left"
+def move_towards_food_x(snake_pos, food_pos):
+    dx = food_pos["x"] - snake_pos["x"]
+    if dx > 0 :
+        return "right"
     else:
-            if dy < 0 :
-                    return "down"
-            else:
-                    return "up"
-
-
+        return "left"
+              
+def move_towards_food_y(snake_pos, food_pos):
+    dy = food_pos["y"] - snake_pos["y"]
+    if dy < 0 :
+        return "down"
+    else:
+        return "up"
+  
 def calculate_distance_to_food(my_head, food_position):
     x_distance = abs(my_head['x'] - food_position['x'])
     y_distance = abs(my_head['y'] - food_position['y'])
@@ -147,10 +146,12 @@ def move(game_state: typing.Dict) -> typing.Dict:
                 smallest_distance = distance
                 correct_food = food_item
 
-        correct_direction = move_towards_food(my_head, correct_food)
-
-        if is_move_safe[correct_direction]:
-            next_move = correct_direction
+        x_direction = move_towards_food_x(my_head, correct_food)
+        y_direction = move_towards_food_y(my_head, correct_food)
+        if is_move_safe[x_direction]:
+            next_move = x_direction
+        elif is_move_safe[y_direction]:
+            next_move = y_direction
         else:
             next_move = random.choice(safe_moves)
 
