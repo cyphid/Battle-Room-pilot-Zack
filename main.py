@@ -49,7 +49,7 @@ def is_cell_occupied(x: int, y: int, game_state: typing.Dict) -> bool:
         # Check for all snakes (including your own)
         for snake in board['snakes']:
                 for segment in snake['body']:
-                        if segment['x'] == x and segment['y'] == y and not(segment == snake['body'][-1]):
+                        if segment['x'] == x and segment['y'] == y:
                                 return True
                           
         # Avoid head-to-head
@@ -89,6 +89,19 @@ def move(game_state: typing.Dict) -> typing.Dict:
         is_move_safe = {"up": True, "down": True, "left": True, "right": True}
 
         my_head = game_state["you"]["body"][0]  # Coordinates of your head
+        my_neck = game_state["you"]["body"][1]  # Coordinates of your "neck"
+
+        if my_neck["x"] < my_head["x"]:  # Neck is left of head, don't move left
+            is_move_safe["left"] = False
+
+        elif my_neck["x"] > my_head["x"]:  # Neck is right of head, don't move right
+            is_move_safe["right"] = False
+
+        elif my_neck["y"] < my_head["y"]:  # Neck is below head, don't move down
+            is_move_safe["down"] = False
+
+        elif my_neck["y"] > my_head["y"]:  # Neck is above head, don't move up
+            is_move_safe["up"] = False
 
         # TODO: Step 1 - Prevent your Battlesnake from moving out of bounds
         board_width = game_state['board']['width']
@@ -138,7 +151,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
         # TODO: Step 4 - Move towards food instead of random, to regain health and survive longer
         food = game_state['board']['food']
         
-        smallest_distance = 10000
+        smallest_distance = 1000
         correct_food = None
         for food_item in food:
             distance = calculate_distance_to_food(my_head, food_item)
@@ -152,8 +165,10 @@ def move(game_state: typing.Dict) -> typing.Dict:
             next_move = x_direction
         elif is_move_safe[y_direction]:
             next_move = y_direction
+            print(f"Moving towards food at ({correct_food['x']}, {correct_food['y']})")
         else:
             next_move = random.choice(safe_moves)
+            print("Feeding is unsafe!!! doing random move")
 
         print(f"MOVE {game_state['turn']}: {next_move}")
         return {"move": next_move}
